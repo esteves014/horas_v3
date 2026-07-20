@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:horas_v3/services/auth_service.dart';
 
 class RegisterScreen extends StatelessWidget {
   RegisterScreen({super.key});
@@ -8,6 +9,8 @@ class RegisterScreen extends StatelessWidget {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+
+  final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +53,37 @@ class RegisterScreen extends StatelessWidget {
                       decoration: InputDecoration(hintText: 'Confirmar Senha'),
                       obscureText: true,
                     ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_passwordController.text ==
+                            _confirmPasswordController.text) {
+                          String? erro = await authService.registerUser(
+                            name: _nameController.text,
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                          );
+                          if (!context.mounted) return;
+
+                          if (erro != null) {
+                            final snackBar = SnackBar(content: Text(erro));
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(snackBar);
+                          } else {
+                            Navigator.pop(context);
+                          }
+                        } else {
+                          final snackBar = SnackBar(
+                            content: Text('As senhas não correspondem'),
+                            backgroundColor: Colors.red,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      },
+                      child: Text('Cadastrar'),
+                    ),
+                    SizedBox(height: 16),
                   ],
                 ),
               ),

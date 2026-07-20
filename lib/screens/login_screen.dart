@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:horas_v3/screens/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -46,7 +48,12 @@ class LoginScreen extends StatelessWidget {
                     SizedBox(height: 16),
                     TextButton(
                       onPressed: () => {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen()))
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegisterScreen(),
+                          ),
+                        ),
                       },
                       child: Text('Ainda não tem uma conta? Crie uma conta'),
                     ),
@@ -58,5 +65,25 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<UserCredential> signInWithGoogle() async {
+    final googleSignIn = GoogleSignIn.instance;
+
+    await googleSignIn.initialize();
+
+    final GoogleSignInAccount googleUser = await googleSignIn.authenticate();
+
+    final clientAuth = await googleUser.authorizationClient.authorizeScopes([
+      'email',
+      'profile',
+    ]);
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: clientAuth.accessToken,
+      idToken: googleUser.authentication.idToken,
+    );
+
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 }
