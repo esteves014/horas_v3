@@ -2,12 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:horas_v3/screens/register_screen.dart';
+import 'package:horas_v3/screens/reset_password_modal.dart';
+import 'package:horas_v3/services/auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +43,37 @@ class LoginScreen extends StatelessWidget {
                       controller: _passwordController,
                       decoration: InputDecoration(hintText: 'Password'),
                     ),
-                    ElevatedButton(onPressed: () => {}, child: Text('Entrar')),
+                    ElevatedButton(
+                      onPressed: () =>
+                      {
+                        _authService
+                            .loginUser(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        )
+                            .then((String? erro) {
+                          if (erro != null) {
+                            final snackBar = SnackBar(
+                              content: Text(erro),
+                              backgroundColor: Colors.red,
+                            );
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(snackBar);
+                          }
+                        }),
+                      },
+                      child: Text('Entrar'),
+                    ),
                     SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => {},
+                      onPressed: () => {signInWithGoogle()},
                       child: Text('Entrar com Google'),
                     ),
                     SizedBox(height: 16),
                     TextButton(
-                      onPressed: () => {
+                      onPressed: () =>
+                      {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -56,6 +82,16 @@ class LoginScreen extends StatelessWidget {
                         ),
                       },
                       child: Text('Ainda não tem uma conta? Crie uma conta'),
+                    ),
+
+                    TextButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context, builder: (BuildContext context) {
+                          return ResetPasswordModal();
+                        });
+                      },
+                      child: Text('Esqueci minha senha'),
                     ),
                   ],
                 ),
