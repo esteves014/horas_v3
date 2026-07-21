@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:horas_v3/components/delete_account_modal.dart';
 import 'package:horas_v3/services/auth_service.dart';
 
 class Menu extends StatelessWidget {
@@ -25,6 +26,21 @@ class Menu extends StatelessWidget {
             title: const Text('Log Out'),
             onTap: () {
               AuthService().logout();
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.delete, color: Colors.red,),
+            title: const Text(
+              'Delete Account',
+              style: TextStyle(color: Colors.red),
+            ),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return DeleteAccountModal(user: user,);
+                },
+              );
             },
           ),
         ],
